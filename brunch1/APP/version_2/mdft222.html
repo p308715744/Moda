@@ -1,0 +1,51 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>美达VCR——大连超级美女榜</title>
+<link href="version_2/styles/end.css" rel="stylesheet" type="text/css"/>
+<link href="version_2/styles/reset.css" rel="stylesheet" type="text/css"/>
+<link href="version_2/styles/vcr_interview.css" rel="stylesheet" type="text/css"/>
+<link href="version_2/styles/headfooter/bighead.css" rel="stylesheet" type="text/css" />
+<link href="version_2/styles/headfooter/footer.css" rel="stylesheet" type="text/css" />
+<link href="version_2/styles/mdft.css" rel="stylesheet" type="text/css"/>
+
+</head>
+
+<body>
+    <div id="box">   
+<?php require(APP_DIR . '/version_2/index_header.html'); ?>
+        <div class="main"><!--主体-->
+        		<div id="cont">
+                        <div id="cont_a">
+                            <div id="cont_a_a"><img src="version_2/images/feature_logo.jpg" width="160" height="56"/></div>
+                            <div id="cont_a_b">
+                                <ul class="cont_a_b_a">
+                                        <li class="cont_a_b_a_c"><img src="<?php echo $news['img_url']?>" width="153" height="112"/></li>
+                                        <li class="cont_a_b_a_a"><img src="<?php echo $news['url']?>" width="578" height="50"/></li>
+                                        <li class="cont_a_b_a_b"><?php echo $news['news_content']?></li>
+                                </ul>
+                            </div>
+                                
+                
+                        </div>
+                        
+                        
+                        <div id="cont_b" style="padding-left:15px; padding-right:0;">
+                            <?php echo $news['content'] ?>
+                        </div>
+                        
+                        
+                        <div id="cont_c">
+                            <ul class="cont_c_a">
+                                <?php foreach($allnews as $an){?>               
+                                <li><a href="?controller=ModaIndex&action=ModaNews&id=<?php echo $an['news_id']?>"><?php echo $an['news_title'] ?></a><h4>-<?php echo $an['news_st']?></h4></li>
+                                <?php }?>
+                            </ul>
+                        </div>
+                    </div>
+        </div>
+       <?php require(APP_DIR . '/version_2/index_footer.html'); ?>
+</div>
+</body>
+</html>

@@ -1,0 +1,437 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>新青年——美达</title>
+<link href="version_2/styles/end.css" rel="stylesheet" type="text/css" />
+<link href="version_2/styles/reset.css" rel="stylesheet" type="text/css"  />
+<link href="version_2/styles/moda_index.css" rel="stylesheet" type="text/css" />
+<link href="version_2/styles/headfooter/bighead.css" rel="stylesheet" type="text/css" />
+<link href="version_2/styles/headfooter/footer.css" rel="stylesheet" type="text/css" />
+<LINK rel=stylesheet type=text/css href="version_2/styles/lanrentuku.css">
+<SCRIPT type=text/javascript>
+var jq = function (id) {
+	return "string" == typeof id ? document.getElementById(id) : id;
+};
+
+var Extend = function(destination, source) {
+	for (var property in source) {
+		destination[property] = source[property];
+	}
+	return destination;
+}
+
+var CurrentStyle = function(element){
+	return element.currentStyle || document.defaultView.getComputedStyle(element, null);
+}
+
+var Bind = function(object, fun) {
+	var args = Array.prototype.slice.call(arguments).slice(2);
+	return function() {
+		return fun.apply(object, args.concat(Array.prototype.slice.call(arguments)));
+	}
+}
+
+var Tween = {
+	Quart: {
+		easeOut: function(t,b,c,d){
+			return -c * ((t=t/d-1)*t*t*t - 1) + b;
+		}
+	},
+	Back: {
+		easeOut: function(t,b,c,d,s){
+			if (s == undefined) s = 1.70158;
+			return c*((t=t/d-1)*t*((s+1)*t + s) + 1) + b;
+		}
+	},
+	Bounce: {
+		easeOut: function(t,b,c,d){
+			if ((t/=d) < (1/2.75)) {
+				return c*(7.5625*t*t) + b;
+			} else if (t < (2/2.75)) {
+				return c*(7.5625*(t-=(1.5/2.75))*t + .75) + b;
+			} else if (t < (2.5/2.75)) {
+				return c*(7.5625*(t-=(2.25/2.75))*t + .9375) + b;
+			} else {
+				return c*(7.5625*(t-=(2.625/2.75))*t + .984375) + b;
+			}
+		}
+	}
+}
+
+
+//容器对象,滑动对象,切换数量
+var SlideTrans = function(container, slider, count, options) {
+	this._slider = jq(slider);
+	this._container = jq(container);//容器对象
+	this._timer = null;//定时器
+	this._count = Math.abs(count);//切换数量
+	this._target = 0;//目标值
+	this._t = this._b = this._c = 0;//tween参数
+	
+	this.Index = 0;//当前索引
+	
+	this.SetOptions(options);
+	
+	this.Auto = !!this.options.Auto;
+	this.Duration = Math.abs(this.options.Duration);
+	this.Time = Math.abs(this.options.Time);
+	this.Pause = Math.abs(this.options.Pause);
+	this.Tween = this.options.Tween;
+	this.onStart = this.options.onStart;
+	this.onFinish = this.options.onFinish;
+	
+	var bVertical = !!this.options.Vertical;
+	this._css = bVertical ? "top" : "left";//方向
+	
+	//样式设置
+	var p = CurrentStyle(this._container).position;
+	p == "relative" || p == "absolute" || (this._container.style.position = "relative");
+	this._container.style.overflow = "hidden";
+	this._slider.style.position = "absolute";
+	
+	this.Change = this.options.Change ? this.options.Change :
+		this._slider[bVertical ? "offsetHeight" : "offsetWidth"] / this._count;
+};
+SlideTrans.prototype = {
+  //设置默认属性
+  SetOptions: function(options) {
+	this.options = {//默认值
+		Vertical:	true,//是否垂直方向（方向不能改）
+		Auto:		true,//是否自动
+		Change:		0,//改变量
+		Duration:	50,//滑动持续时间
+		Time:		10,//滑动延时
+		Pause:		4000,//停顿时间(Auto为true时有效)
+		onStart:	function(){},//开始转换时执行
+		onFinish:	function(){},//完成转换时执行
+		Tween:		Tween.Quart.easeOut//tween算子
+	};
+	Extend(this.options, options || {});
+  },
+  //开始切换
+  Run: function(index) {
+	//修正index
+	index == undefined && (index = this.Index);
+	index < 0 && (index = this._count - 1) || index >= this._count && (index = 0);
+	//设置参数
+	this._target = -Math.abs(this.Change) * (this.Index = index);
+	this._t = 0;
+	this._b = parseInt(CurrentStyle(this._slider)[this.options.Vertical ? "top" : "left"]);
+	this._c = this._target - this._b;
+	
+	this.onStart();
+	this.Move();
+  },
+  //移动
+  Move: function() {
+	clearTimeout(this._timer);
+	//未到达目标继续移动否则进行下一次滑动
+	if (this._c && this._t < this.Duration) {
+		this.MoveTo(Math.round(this.Tween(this._t++, this._b, this._c, this.Duration)));
+		this._timer = setTimeout(Bind(this, this.Move), this.Time);
+	}else{
+		this.MoveTo(this._target);
+		this.Auto && (this._timer = setTimeout(Bind(this, this.Next), this.Pause));
+	}
+  },
+  //移动到
+  MoveTo: function(i) {
+	this._slider.style[this._css] = i + "px";
+  },
+  //下一个
+  Next: function() {
+	this.Run(++this.Index);
+  },
+  //上一个
+  Previous: function() {
+	this.Run(--this.Index);
+  },
+  //停止
+  Stop: function() {
+	clearTimeout(this._timer); this.MoveTo(this._target);
+  }
+};
+</SCRIPT>
+
+
+
+
+
+<script src="version_2/js/jquery.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+//滚动插件
+(function($){
+$.fn.extend({
+        Scroll:function(opt,callback){
+                //参数初始化
+                if(!opt) var opt={};
+                var _this=this.eq(0).find("ul:first");
+                var        lineH=_this.find("li:first").height(), //获取行高
+                        line=opt.line?parseInt(opt.line,10):parseInt(this.height()/lineH,10), //每次滚动的行数，默认为一屏，即父容器高度
+                        speed=opt.speed?parseInt(opt.speed,10):500, //卷动速度，数值越大，速度越慢（毫秒）
+                        timer=opt.timer?parseInt(opt.timer,10):3000; //滚动的时间间隔（毫秒）
+                if(line==0) line=1;
+                var upHeight=0-line*lineH;
+                //滚动函数
+                scrollUp=function(){
+                        _this.animate({
+                                marginTop:upHeight
+                        },speed,function(){
+                                for(i=1;i<=line;i++){
+                                        _this.find("li:first").appendTo(_this);
+                                }
+                                _this.css({marginTop:0});
+                        });
+                }
+                //鼠标事件绑定
+                _this.hover(function(){
+                        clearInterval(timerID);
+                },function(){
+                        timerID=setInterval("scrollUp()",timer);
+                }).mouseout();
+        }        
+})
+})(jQuery);
+
+$(document).ready(function(){
+        $("#scrollDiv").Scroll({line:1,speed:1000,timer:3000});
+});
+</script>
+</head>
+
+<body>
+
+<div id="box">  
+ 
+<?php require(APP_DIR . '/version_2/index_header.html'); ?>
+		
+        <div class="moda_lunhuan">
+                		<DIV id=idContainer2 class=container>
+                <TABLE id=idSlider2 border=0 cellSpacing=0 cellPadding=0>
+                  <TBODY>
+                  <TR>
+                    <TD class=td_f><A href="<?php echo $doorDat['img1_link']?>" target="_blank"><IMG src="<?php echo $doorDat['img_1']?>" width="978" height="360"/></A></TD>
+                    <TD class=td_f><A href="<?php echo $doorDat['img2_link']?>" target="_blank"><IMG src="<?php echo $doorDat['img_2']?>" width="978" height="360"/></A></TD>
+                    <TD class=td_f><A href="<?php echo $doorDat['img3_link']?>" target="_blank"><IMG src="<?php echo $doorDat['img_3']?>" width="978" height="360"/></A></TD>
+                    <TD class=td_f><A href="<?php echo $doorDat['img4_link']?>" target="_blank"><IMG src="<?php echo $doorDat['img_4']?>" width="978" height="360"/></A></TD>
+                    <TD class=td_f><A href="<?php echo $doorDat['img5_link']?>" target="_blank"><IMG src="<?php echo $doorDat['img_5']?>" width="978" height="360"/></A></TD>
+                   </TR></TBODY></TABLE>
+                <UL id=idNum class=num></UL>
+                </DIV>
+                <SCRIPT>
+					var forEach = function(array, callback, thisObject){
+						if(array.forEach){
+							array.forEach(callback, thisObject);
+						}else{
+							for (var i = 0, len = array.length; i < len; i++) { callback.call(thisObject, array[i], i, array); }
+						}
+					}
+					
+					var st = new SlideTrans("idContainer2", "idSlider2", 5, { Vertical: false });
+					
+					var nums = [];
+					//插入数字
+					for(var i = 0, n = st._count - 1; i <= n;){
+						(nums[i] = jq("idNum").appendChild(document.createElement("li"))).innerHTML = ++i;
+					}
+					
+					forEach(nums, function(o, i){
+						o.onmouseover = function(){ o.className = "on"; st.Auto = false; st.Run(i); }
+						o.onmouseout = function(){ o.className = ""; st.Auto = true; st.Run(); }
+					})
+					
+					//设置按钮样式
+					st.onStart = function(){
+						forEach(nums, function(o, i){ o.className = st.Index == i ? "on" : ""; })
+					}
+					st.Run();
+				</SCRIPT>
+        </div>
+		
+        <div class="moda_ad">
+        	<div id="scrollDiv">
+              <ul>
+						<?php foreach($ads_uproll as $v){ ?>
+                        <li><a href="<?php echo $v['link']?>" target="_blank"><img src="<?php echo $v['image']?>" width="978" height="180" border="0" /></a></li>
+						<?php }?>
+                
+              </ul>
+            </div>
+        </div>
+
+        <div class="moda_one">
+        	<div class="moda_one_shenqing">
+            	<em><a href="?Controller=Index3&action=Register" target="_blank"></a></em>
+                <span><a href="http://bbs.we54.com/forumdisplay.php?fid=949" target="_blank"></a></span>
+            </div>
+            <div class="moda_one_kossme">
+                <a href="<?php echo $doorDat['img7_link']?>" target="_blank"><img src="<?php echo $doorDat['img_7']?>" width="348" height="249" border="0" /></a>
+            </div>
+            <div class="moda_one_right">
+                <a href="<?php echo $doorDat['img8_link']?>" target="_blank"><img src="<?php echo $doorDat['img_8']?>" width="348" height="249" border="0" /></a>
+            </div>
+        </div>
+        
+        <div class="moda_two">
+        	<div class="moda_two_ad"><h1><a href="?Controller=ModaIndex&action=ModaLank" target="_blank"><img src="version_2/images/moda_index_btn.jpg" width="179" height="30" border="0" /></a></h1></div>
+            <div class="moda_two_list">
+            	<ul>
+						<?php foreach($result2 as $r2){ $showDat = $tableModaShow->getShowByShowIdNoLimit($r2['show_id']); ?>
+                        <?php if($r2['rank_id'] == 12){?>
+                            <li><div id="moda_two_list_dingwei"  name="moda_two_list_dingwei"><div class="dingwei"></div>
+                            <div><a href="?Controller=ShowIndex&action=ShowDetail&user_id=<?php echo $r2['user_id']?>&show_id=<?php echo $r2['show_id']?>" target="_blank"><img src="<?php echo $r2['head_img']?>" width="240" height="158" border="0" /></a></div></div>
+                            <div class="moda_two_list_jieshao"><em><a href="?Controller=ShowIndex&action=ShowDetail&user_id=<?php echo $r2['user_id']?>&show_id=<?php echo $r2['show_id']?>" target="_blank"><?php echo $r2['title']?></a></em><span><i><?php echo $showDat['views']?></i>次浏览/<i><?php echo $showDat['discuss_count']?></i>评论</span></div></li>
+                        <?php }else{?>    
+                            <li><div id="moda_two_list_dingwei"  name="moda_two_list_dingwei"><div class="dingwei"></div>
+                            <div><a href="#" target="_blank"><img src="version_2/images/moda_ad4.jpg" width="240" height="158" border="0" /></a></div></div>
+                            <div class="moda_two_list_jieshao"><em><a href="#" target="_blank">请小宝</a></em><span><i>130</i>次浏览/<i>54</i>评论</span></div></li>
+						<?php }}?>	
+                </ul>
+            </div>
+        </div>
+        
+        <div class="moda_three">
+        	<div class="moda_three_vcr">
+            	<div class="moda_three_vcrbtn"><a href="?Controller=ModaIndex&action=AllNews" target="_blank"><img src="version_2/images/moda_index_vcrbtn.jpg" width="87" height="20" border="0" /></a></div>
+            	<div class="moda_three_vcrpic">
+                	<h1><a href="?Controller=ModaIndex&action=ModaNews&id=<?php echo $news['news_id']?>" target="_blank"><img src="<?php echo $news['img_url']?>" width="286" height="172" border="0" /></a></h1>
+                    <em>美达·大连超级美女榜 <?php echo $news['news_st']?></em>
+                    <span><a href="#" target="_blank"><?php echo $news['news_title']?></a></span>
+                    <tt><?php echo $news['created_on']?></tt>
+                </div>
+                <div class="moda_three_teyue">特约拍摄：新青年视频工作室</div>
+            </div>
+            <div class="moda_three_hezuo">
+            	<ul>
+                	<li><a href="http://macchiato.cc/" target="_blank"><img src="version_2/images/hezuo1.jpg" width="282" height="82" border="0" /></a></li>
+                    <li><a href="http://photo.we54.com/" target="_blank"><img src="version_2/images/hezuo2.jpg" width="282" height="82" border="0" /></a></li>
+                    <li><a href="http://weibo.com/youngfilm" target="_blank"><img src="version_2/images/hezuo3.jpg" width="282" height="82" border="0" /></a></li>
+                </ul>
+            </div>
+            <div class="moda_three_hot">
+            	<ul>
+                	<?php foreach($userext as $dat){?>
+                	<li><h1><a href="?Controller=ModaIndex&action=Person&id=<?php echo $dat['user_id']?>" target="_blank"><img src="<?php echo $dat['face']?>" width="95" height="79" border="0" /></a></h1><b><a href="#" target="_blank"><?php echo $dat['truename']?></a><i>总人气：（<?php echo  $dat['extdats']['zongshu']?>）</i></b>
+                    <dl><dt><span>活跃度：</span><tt><img src="version_2/images/moda_index_hot_a.jpg" width="<?php if($dat['extdats']['huoyuedupoint'] > 139) echo 139; else echo $dat['extdats']['huoyuedupoint']?>" height="16" border="0" /><em><?php echo $dat['extdats']['huoyuedu']?></em></tt></dt>
+                    <dt><span>粉丝数：</span><tt><img src="version_2/images/moda_index_hot_b.jpg" width="<?php if($dat['extdats']['fensishupoint'] > 139) echo 139; else echo $dat['extdats']['fensishupoint']?>" height="16" border="0" /><em><?php echo $dat['extdats']['fensishu']?></em></tt></dt></dl></li>
+                    <?php }?>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="moda_four">
+        	<div class="moda_four_ad"><h1><a href="#" target="_blank"><img src="version_2/images/moda_index_btn2.jpg" width="179" height="30" border="0" /></a></h1></div>
+            <div class="moda_four_top">
+            	<ul>
+                	<li><div id="moda_four_toplist"  name="moda_four_toplist"><div class="dingwei_list"><b><a href="#" target="_blank">优美的写真</a></b><em><span>2039</span>次浏览/<span>0</span>条评论</em></div>
+                    <div><a href="#" target="_blank"><img src="version_2/images/moda_ad.jpg" width="182" height="195" border="0" /></a></div></div></li>
+                    <li><div id="moda_four_toplist"  name="moda_four_toplist"><div class="dingwei_list"><b><a href="#" target="_blank">优美的写真</a></b><em><span>2039</span>次浏览/<span>0</span>条评论</em></div>
+                    <div><a href="#" target="_blank"><img src="version_2/images/moda_ad.jpg" width="182" height="195" border="0" /></a></div></div></li>
+                    <li><div id="moda_four_toplist"  name="moda_four_toplist"><div class="dingwei_list"><b><a href="#" target="_blank">优美的写真</a></b><em><span>2039</span>次浏览/<span>0</span>条评论</em></div>
+                    <div><a href="#" target="_blank"><img src="version_2/images/moda_ad.jpg" width="182" height="195" border="0" /></a></div></div></li>
+                    <li><div id="moda_four_toplist"  name="moda_four_toplist"><div class="dingwei_list"><b><a href="#" target="_blank">优美的写真</a></b><em><span>2039</span>次浏览/<span>0</span>条评论</em></div>
+                    <div><a href="#" target="_blank"><img src="version_2/images/moda_ad.jpg" width="182" height="195" border="0" /></a></div></div></li>
+                    <li><div id="moda_four_toplist"  name="moda_four_toplist"><div class="dingwei_list"><b><a href="#" target="_blank">优美的写真</a></b><em><span>2039</span>次浏览/<span>0</span>条评论</em></div>
+                    <div><a href="#" target="_blank"><img src="version_2/images/moda_ad.jpg" width="182" height="195" border="0" /></a></div></div></li>
+                    <li><div id="moda_four_toplist"  name="moda_four_toplist"><div class="dingwei_list"><b><a href="#" target="_blank">优美的写真</a></b><em><span>2039</span>次浏览/<span>0</span>条评论</em></div>
+                    <div><a href="#" target="_blank"><img src="version_2/images/moda_ad.jpg" width="182" height="195" border="0" /></a></div></div></li>
+                    <li><div id="moda_four_toplist"  name="moda_four_toplist"><div class="dingwei_list"><b><a href="#" target="_blank">优美的写真</a></b><em><span>2039</span>次浏览/<span>0</span>条评论</em></div>
+                    <div><a href="#" target="_blank"><img src="version_2/images/moda_ad.jpg" width="182" height="195" border="0" /></a></div></div></li>
+                    <li><div id="moda_four_toplist"  name="moda_four_toplist"><div class="dingwei_list"><b><a href="#" target="_blank">优美的写真</a></b><em><span>2039</span>次浏览/<span>0</span>条评论</em></div>
+                    <div><a href="#" target="_blank"><img src="version_2/images/moda_ad.jpg" width="182" height="195" border="0" /></a></div></div></li>
+                	<li><div id="moda_four_toplist"  name="moda_four_toplist"><div class="dingwei_list"><b><a href="#" target="_blank">优美的写真</a></b><em><span>2039</span>次浏览/<span>0</span>条评论</em></div>
+                    <div><a href="#" target="_blank"><img src="version_2/images/moda_ad.jpg" width="182" height="195" border="0" /></a></div></div></li>
+                    <li><div id="moda_four_toplist"  name="moda_four_toplist"><div class="dingwei_list"><b><a href="#" target="_blank">优美的写真</a></b><em><span>2039</span>次浏览/<span>0</span>条评论</em></div>
+                    <div><a href="#" target="_blank"><img src="version_2/images/moda_ad.jpg" width="182" height="195" border="0" /></a></div></div></li>
+                    <li><div id="moda_four_toplist"  name="moda_four_toplist"><div class="dingwei_list"><b><a href="#" target="_blank">优美的写真</a></b><em><span>2039</span>次浏览/<span>0</span>条评论</em></div>
+                    <div><a href="#" target="_blank"><img src="version_2/images/moda_ad.jpg" width="182" height="195" border="0" /></a></div></div></li>
+                    <li><div id="moda_four_toplist"  name="moda_four_toplist"><div class="dingwei_list"><b><a href="#" target="_blank">优美的写真</a></b><em><span>2039</span>次浏览/<span>0</span>条评论</em></div>
+                    <div><a href="#" target="_blank"><img src="version_2/images/moda_ad.jpg" width="182" height="195" border="0" /></a></div></div></li>
+                </ul>
+            </div>
+        </div>
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        <div class="moda_lianxi">
+        	<div class="moda_lianxi_bianji">
+            	<b>美达产品部责任编辑：</b>
+                <span>Lynn Zhu / Amber Cui</span>
+            </div>
+            <div class="moda_lianxi_qihua">
+            	<b>企划联系：</b>
+                <span>QQ：411545454</span>
+                <span>0411-82568888</span>
+                <span>E-mail：moda.we54@qq.com</span>
+            </div>
+            <div class="moda_lianxi_weibo">
+            	<b>新浪官方微博：</b>
+                <span>@新青年网-美达大连超级美女榜</span>
+                <tt><a href="#" target="_blank"><img src="version_2/images/moda_jiaguanzhu.jpg" width="68" height="23" border="0" /></a></tt>
+            </div>
+        </div>
+		
+        <div id="footer" style="margin-bottom:15px; display:inline;"><!--底部-->
+            <a href="http://www.we54.com" target="_blank">首页</a>
+            <a href="http://news.we54.com" target="_blank">大连你好</a>
+            <a href="#" target="_blank">视频</a>
+            <a href="http://pic.we54.com" target="_blank">图片</a>
+            <a href="http://newhouse.we54.com" target="_blank">房产</a>
+            <a href="http://auto.we54.com" target="_blank">汽车</a>
+            <a href="http://travel.we54.com/" target="_blank">旅游</a>
+            <a href="http://uni.we54.com" target="_blank">教育</a>
+            <a href="#" target="_blank">财经</a>
+            <a href="http://eat.we54.com" target="_blank">美食</a>
+            <a href="#" target="_blank">高校</a>
+            <a href="http://moda.we54.com" target="_blank">美达</a>
+            <a href="http://54class.we54.com" target="_blank">五年四班</a>
+            <a href="http://lichi.we54.com" target="_blank">荔枝先生</a>
+            <a href="http://pub.we54.com" target="_blank">非常夜店</a>
+            <a href="http://blog.we54.com" target="_blank">博客</a>
+            <a href="http://bbs.we54.com" target="_blank">论坛</a>
+        </div>	
+
+
+        <div id="foot"  >
+            <span>
+                <a href="http://news.we54.com/we54/about/index.html" target="_blank">新青年网介绍</a> <tt>|</tt>
+                <a href="http://news.we54.com/we54/mzsm/mzsm.html" target="_blank">免责声明</a> <tt>|</tt>
+                <a href="http://news.we54.com/we54/flsm/index.html" target="_blank">法律声明</a> <tt>|</tt> 
+                <a href="http://company.zhaopin.com/P3/CC1949/9182/CC194991820.htm" target="_blank">工作机会</a> <tt>|</tt>
+                <a href="http://news.we54.com/we54/bhysq/bhysq.html" target="_blank">保护隐私权</a> <tt>|</tt> 
+                <a href="http://news.we54.com/we54/yyqlj/yyqlj.html" target="_blank">友情链接</a> <tt>|</tt> 
+                <a href="http://news.we54.com/we54/bbsltxkz/bbsltxkz.html" target="_blank">BBS论坛许可证</a> 
+            </span>
+            <em>新青年(大连)网络信息技术有限公司 版权所有</em>
+            <em>Copyright ? 2007-2012 we54.com INC. All RIGHTS RESERVED. </em>
+            <em>辽B-2-4-20070064</em>
+            <div class="foot_tupian" style="width:1000px; margin:0 auto;">
+                <i><b>战略合作伙伴</b>
+                <h1><a><img src="version_2/images/logo4.jpg" width="102" height="38" border="0" /></a></h1>
+                <h2><a><img src="version_2/images/logo5.jpg" width="101" height="38" border="0" /></a></h2>
+                <h3><a><img src="version_2/images/logo6.jpg" width="108" height="38" border="0" /></a></h3></i>
+            </div>  
+        
+                <ul>
+                    <li></li>
+                <li><a href="http://net.china.com.cn/index.htm" target="_blank"><img src="version_2/images/logo8.jpg" width="120px" height="50px" border="0"/></a></li>
+                <li><a href="http://www.bj.cyberpolice.cn/index.js" target="_blank"><img src="version_2/images/logo11.jpg" width="120px" height="50px" border="0"/></a></li>
+                <li><a href="http://www.bj.cyberpolice.cn/index.js" target="_blank"><img src="version_2/images/logo9.jpg" width="120px" height="50px" border="0"/></a></li>
+                <li></li>
+                </ul>
+                </div>
+</div>
+</body>
+</html>

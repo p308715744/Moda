@@ -1,0 +1,30 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>美达招募-美达-新青年</title>
+<link href="version_2/styles/end.css" rel="stylesheet" type="text/css"/>
+<link href="version_2/styles/reset.css" rel="stylesheet" type="text/css"/>
+<link href="version_2/styles/headfooter/bighead.css" rel="stylesheet" type="text/css" />
+<link href="version_2/styles/headfooter/footer.css" rel="stylesheet" type="text/css" />
+<link href="version_2/styles/moda_zhaomu_list.css" rel="stylesheet" type="text/css"/>
+</head>
+
+<body>
+<div id="box">
+<?php require(APP_DIR . '/version_2/index_header.html'); ?>
+     	<div class="zhanmu_list"><!--招募列表-->       
+      		<div class="zhaomu_logo"><img src="version_2/images/zhaomu.jpg" width="174" height="70" border="0" /></div>  
+        	<ul>
+            <?php foreach($modaEvent as $dat){?>
+        	<?php if($dat['link']){?>
+        		<li><a href="<?php echo $dat['link'];?>" title="" target="_blank"><img src="<?php echo $dat['index_img'];?>" width="468" height="278" border="0" /></a></li>
+            <?php }else{?>
+        		<li><a href="?Controller=ModaIndex&action=Recruitpage&event_id=<?php echo $dat['event_id'];?>" title="" target="_blank"><img src="<?php echo $dat['index_img'];?>" width="468" height="278" border="0" /></a></li>
+            <?php }}?>
+        	</ul>
+  		</div>      
+<?php require(APP_DIR . '/version_2/index_footer.html'); ?>    
+</div>
+</body>
+</html>

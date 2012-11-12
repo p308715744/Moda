@@ -1,0 +1,31 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>美达活动-美达-新青年</title>
+<link href="version_2/styles/end.css" rel="stylesheet" type="text/css"/>
+<link href="version_2/styles/reset.css" rel="stylesheet" type="text/css"/>
+<link href="version_2/styles/headfooter/bighead.css" rel="stylesheet" type="text/css" />
+<link href="version_2/styles/headfooter/footer.css" rel="stylesheet" type="text/css" />
+<link href="version_2/styles/moda_activity.css" rel="stylesheet" type="text/css"/>
+</head>
+
+<body>
+<div id="box">
+<?php require(APP_DIR . '/version_2/index_header.html'); ?>
+     	<div class="zhanmu_list"><!--招募列表-->       
+      		<div class="zhaomu_logo"><img src="version_2/images/moda_activity.jpg" width="174" height="84" border="0" /></div>  
+        	<ul>
+            <?php foreach($modaEvent as $me){?>
+        		<li><a href="?Controller=ModaIndex&action=ModaEvent&event_id=<?php echo $me['event_id']?>" class="box"><img src="<?php echo $me['index_img']?>" /></a></li>
+            <?php }?>
+        	</ul>
+            
+            <!--<ol id="list_pg"> --><!--页码-->
+              <!--<?php echo $page->pageHtml;?> -->
+           <!-- </ol> -->
+  		</div>      
+    <?php require(APP_DIR . '/version_2/index_footer.html'); ?>          
+</div>
+</body>
+</html>

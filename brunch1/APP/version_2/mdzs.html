@@ -1,0 +1,115 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>美达-----大连超级美女榜</title>
+<link href="version_2/styles/end.css" rel="stylesheet" type="text/css" />
+<link href="version_2/styles/reset.css" rel="stylesheet" type="text/css"  />
+<link href="version_2/styles/headfooter/bighead.css" rel="stylesheet" type="text/css" />
+<link href="version_2/styles/headfooter/footer.css" rel="stylesheet" type="text/css" />
+<link href="version_2/styles/modashowgirl/showgirl.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body class="mdzs">
+<?php require(APP_DIR . '/version_2/header.html'); ?> 
+    <div id="main">
+    	<div class="m_showinfo">
+            <div class="m_showlogo">
+                <img src="version_2/images/showgirl/show_logo.jpg" />
+                <span><a href="?Controller=ShowIndex&action=ModaHelp">如何参加排行榜？</a></span>
+            </div>
+            <div class="m_sort">
+                    <span><em></em><a href="?Controller=ShowIndex&action=ModaShows&sort=1">时间排序</a></span><span><em></em><a href="?Controller=ShowIndex&action=ModaShows&sort=2">点击最多</a></span><span><em></em><a href="?Controller=ShowIndex&action=ModaShows&sort=3">评论最多</a></span>
+                </div>
+            <div class="m_showlist">
+            	<?php foreach($rowset as $data){?>
+            	<span class="m_girlinfo">
+                    <a href="?Controller=ShowIndex&action=ShowDetail&user_id=<?php echo $data['user_id'] ;?>&show_id=<?php echo $data['show_id'] ;?>">
+                        <img src="<?php echo $data['show_img']; ?>" width="148" height="110" />
+                        <b><?php echo $data['nickname']; ?> - <?php echo stripslashes($data['title']); ?></b>
+                    </a>
+                	<em><i><?php echo $data['views']; ?></i>&nbsp;次浏览&nbsp;/&nbsp;<i><?php echo $data['discuss_count']; ?></i>&nbsp;评论</em>
+                </span>
+                <?php }?>
+            </div>
+            <ol id="list_pg"><!--页码-->
+                  <li><a href='#'><<<</a></li>
+                  <li class="thisclass"><a>1</a></li>
+                  <li><a href="#" target="_blank">2</a></li>
+                  <li><a href="#" target="_blank">3</a></li> 
+                  <li>...</li>
+                  <li><a href="#" target="_blank">17</a></li>
+                  <li><a href="#" target="_blank">18</a></li>
+                  <li><a href="#" target="_blank">>>></a></li>
+             </ol>
+        </div>
+    	
+    </div>
+	<div class="moda_contact">
+        	<div class="contact_logo">
+            	<img src="version_2/images/modapersonal/contact_logo.jpg"  />
+            </div>
+            <div class="contact_editor">
+				<h2>美达产品部责任编辑：</h2>
+                <em>Lynn Zhu / Amber Cui</em>
+            </div>
+            <div class="contact_info">
+            	<h2>企划联系:</h2>
+                <em>QQ:411545454</em><br />
+                <em>TEL：0411-82568888</em><br />
+                <em>E-mail：moda.we54@qq.com</em>
+            </div>
+            <div class="contact_blog">
+            	<h2>新浪官方微博：</h2>
+                <em>@新青年网-美达大连超级美女榜</em><br />
+                <em><a href=""><img src="version_2/images/modapersonal/Attention.jpg" /></a></em>
+            </div>
+        </div>
+   <div id="footer"><!--底部-->
+    <a href="http://www.we54.com" target="_blank">首页</a>
+    <a href="http://news.we54.com" target="_blank">大连你好</a>
+    <a href="http://54class.we54.com" target="_blank">五年四班</a>
+    <a href="http://#" target="_blank">非常夜店</a>
+    <a href="http://moda.we54.com" target="_blank">美达</a>
+    <a href="http://lichi.we54.com" target="_blank">荔枝先生</a>
+    <a href="http://house.we54.com" target="_blank">房产</a>
+    <a href="http://#" target="_blank">旅游</a>
+    <a href="http://#" target="_blank">教育</a>
+    <a href="http://#" target="_blank">财富</a>
+    <a href="http://#" target="_blank">美食</a>
+    <a href="http://#" target="_blank">奢侈品</a>
+    <a href="http://pic.we54.com" target="_blank">图片</a>
+    <a href="http://blog.we54.com" target="_blank">博客</a>
+    <a href="http://bbs.we54.com" target="_blank">论坛</a>
+</div>
+	<div id="foot">
+    <span>
+        <a href="http://www.we54.com/about/about.html" target="_blank">新青年网介绍</a> <tt>|</tt>
+        <a href="http://www.we54.com/ads/index.html" target="_blank">广告服务</a> <tt>|</tt>
+        <a href="http://www.we54.com/about/hr.htm" target="_blank">诚征英才</a> <tt>|</tt> 
+        <a href="http://www.we54.com/about/bhysq.html" target="_blank">保护隐私权</a> <tt>|</tt>
+        <a href="http://www.we54.com/about/mzsm.html" target="_blank">免责条款</a> <tt>|</tt> 
+        <a href="http://www.we54.com/about/flsm.html" target="_blank">法律顾问</a> <tt>|</tt> 
+        <a href="http://www.we54.com/about/links.html" target="_blank">意见反馈</a> 
+    </span>
+    <em>大连方佰信息技术有限公司 版权所有</em>
+    <em>Copyright &copy; 1996-2001 WE54.COM INC. All RIGHTS RESERVED. </em>
+    <em>京ICP证030609号&nbsp;&nbsp;&nbsp;增值电信业务经营许可证B2-20060060&nbsp;&nbsp;&nbsp;广播电视节目制作经营许可证（京）字第803号&nbsp;&nbsp;&nbsp;网络文化经营许可证文网文【2010】136号 </em>
+    <em>互联网出版许可证新出网证（京）字108号&nbsp;&nbsp;&nbsp;京公安网备110108000189号</em>
+    <div class="foot_tupian" style="width:1000px; margin:0 auto;">
+    <i><b>战略合作伙伴</b>
+    <h1><a href="#" target="_blank"><img src="version_2/images/logo4.jpg" width="102" height="38" border="0" /></a></h1>
+    <h2><a href="#" target="_blank"><img src="version_2/images/logo5.jpg" width="101" height="38" border="0" /></a></h2>
+    <h3><a href="#" target="_blank"><img src="version_2/images/logo6.jpg" width="108" height="38" border="0" /></a></h3></i>
+    <ul>
+        <li><a href="http://www.we54.com/about/znjb.html" target="_blank"><img src="version_2/images/logo7.jpg" width="120px" height="50px" border="0"/></a></li>
+        <li><a href="http://net.china.com.cn/index.htm" target="_blank"><img src="version_2/images/logo8.jpg" width="120px" height="50px" border="0"/></a></li>
+        <li><a href="http://www.bj.cyberpolice.cn/index.js" target="_blank"><img src="version_2/images/logo11.jpg" width="120px" height="50px" border="0"/></a></li>
+        <li><a href="http://www.bj.cyberpolice.cn/index.js" target="_blank"><img src="version_2/images/logo9.jpg" width="120px" height="50px" border="0"/></a></li>
+        <li><a href="http://www.bj.cyberpolice.cn/index.js" target="_blank"><img src="version_2/images/logo10.jpg" width="120px" height="50px" border="0"/></a></li>
+    </ul>
+    </div>
+</div>
+</div>
+</body>
+</html>
